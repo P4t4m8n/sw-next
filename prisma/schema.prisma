@@ -1,0 +1,116 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum ModelType {
+  CHARACTER
+  FILM
+  PLANET
+  SPECIES
+  STARSHIP
+}
+
+model Film {
+  id            String      @id @default(cuid())
+  name          String
+  episode_id    Int
+  opening_crawl String
+  director      String
+  producer      String
+  image         Bytes
+  release_date  DateTime
+  characters    Character[]
+  planets       Planet[]
+  starships     Starship[]
+  species       Species[]
+  type          ModelType   @default(FILM)
+}
+
+model Character {
+  id          String     @id @default(cuid())
+  name        String
+  height      String
+  mass        String
+  hair_color  String
+  skin_color  String
+  eye_color   String
+  birth_year  String
+  image       Bytes
+  homeworldId String?
+  gender      String
+  homeworld   Planet?    @relation(fields: [homeworldId], references: [id])
+  specieId    String?
+  species     Species?   @relation(fields: [specieId], references: [id])
+  starships   Starship[]
+  films       Film[]
+  type        ModelType  @default(CHARACTER)
+}
+
+model Planet {
+  id             String      @id @default(uuid())
+  name           String
+  rotationPeriod String
+  orbitalPeriod  String
+  diameter       String
+  climate        String
+  image          Bytes
+  gravity        String
+  terrain        String
+  surfaceWater   String
+  population     String
+  films          Film[]
+  characters     Character[]
+  Species        Species[]
+  type           ModelType   @default(PLANET)
+}
+
+model Starship {
+  id                   String      @id @default(uuid())
+  name                 String
+  model                String
+  manufacturer         String
+  costInCredits        String
+  length               String
+  maxAtmospheringSpeed String
+  crew                 String
+  passengers           String
+  cargoCapacity        String
+  consumables          String
+  hyperdriveRating     String
+  MGLT                 String
+  starshipClass        String
+  image                Bytes
+  characters           Character[]
+  films                Film[]
+  type                 ModelType   @default(STARSHIP)
+}
+
+model Species {
+  id              String      @id @default(uuid())
+  name            String
+  classification  String
+  designation     String
+  averageHeight   String
+  skinColors      String
+  hairColors      String
+  eyeColors       String
+  averageLifespan String
+  language        String
+  homeworldId     String?
+  homeworld       Planet?     @relation(fields: [homeworldId], references: [id])
+  characters      Character[]
+  films           Film[]
+  type            ModelType   @default(SPECIES)
+}
